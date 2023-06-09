@@ -15,8 +15,8 @@ class IdTokenizer(Tokenizer):
     def split(self, text):
         return self.tokenizer.split(text)
 
-    def check_type(self, type):
-        return self.tokenizer.check_type(type)
+    def check_type(self, t):
+        return self.tokenizer.check_type(t)
 
     @property
     def morph(self):
@@ -43,7 +43,8 @@ def _select_span_tokens(tokens, spans):
 
 
 def _get_needed_tokens(text: str, t: IdTokenizer, rules: Sequence[Rule]):
-    ID_TOKENIZER = t
+    TOKENIZER = MorphTokenizer().remove_types(EOL)
+    ID_TOKENIZER = IdTokenizer(TOKENIZER)
 
     Proxy = fact(
         'Proxy',
@@ -51,7 +52,7 @@ def _get_needed_tokens(text: str, t: IdTokenizer, rules: Sequence[Rule]):
     )
 
     r = or_(*rules).interpretation(Proxy.value).interpretation(Proxy)
-    tokens = list(ID_TOKENIZER.tokenizer(text))
+    tokens = list(TOKENIZER(text))
     matches = Parser(r, tokenizer=ID_TOKENIZER).findall(tokens)
     spans = [m.span for m in matches]
 
@@ -62,6 +63,7 @@ def parse(text: str, rule_wrapper: RuleWrapper):
     if rule_wrapper.rules_to_tokenize is not None:
         ID_TOKENIZER = IdTokenizer.default()
         needed_tokens = _get_needed_tokens(text, ID_TOKENIZER, rule_wrapper.rules_to_tokenize)
+        print([t.value for t in needed_tokens])
         return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).findall(needed_tokens)
 
     return Parser(rule_wrapper.root).findall(text)
