@@ -1,6 +1,7 @@
 from typing import Sequence
 
 from yargy import *
+from yargy.predicates import is_title
 from yargy.tokenizer import *
 from yargy.interpretation import *
 from yargy.rule import *
@@ -27,7 +28,7 @@ class IdTokenizer(Tokenizer):
 
     @staticmethod
     def default(rules=RULES):
-        TOKENIZER = MorphTokenizer(rules=RULES).remove_types(EOL)
+        TOKENIZER = MorphTokenizer(rules=rules).remove_types(EOL)
         return IdTokenizer(TOKENIZER)
 
 
@@ -72,4 +73,3 @@ def parse(text: str, rule_wrapper: RuleWrapper, token_rules: Sequence[TokenRule]
         return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).findall(needed_tokens)
 
     return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER.tokenizer).findall(text)
-
