@@ -26,8 +26,8 @@ class IdTokenizer(Tokenizer):
         return tokens
 
     @staticmethod
-    def default():
-        TOKENIZER = MorphTokenizer().remove_types(EOL)
+    def default(rules=RULES):
+        TOKENIZER = MorphTokenizer(rules=RULES).remove_types(EOL)
         return IdTokenizer(TOKENIZER)
 
 
@@ -43,8 +43,8 @@ def _select_span_tokens(tokens, spans):
 
 
 def _get_needed_tokens(text: str, t: IdTokenizer, rules: Sequence[Rule]):
-    TOKENIZER = MorphTokenizer().remove_types(EOL)
-    ID_TOKENIZER = IdTokenizer(TOKENIZER)
+    ID_TOKENIZER = t
+    TOKENIZER = t.tokenizer
 
     Proxy = fact(
         'Proxy',
@@ -59,11 +59,17 @@ def _get_needed_tokens(text: str, t: IdTokenizer, rules: Sequence[Rule]):
     return list(_select_span_tokens(tokens, spans))
 
 
-def parse(text: str, rule_wrapper: RuleWrapper):
+OLD_RUSSIAN_TOKEN_RULE = TokenRule(RUSSIAN, r'[а-яёiѣѳv]+')
+OLD_RUSSIAN_TOKEN_RULES = [TokenRule(RUSSIAN, r'[а-яёiѣѳv]+'), *RULES[1:]]
+
+
+def parse(text: str, rule_wrapper: RuleWrapper, token_rules: Sequence[TokenRule] | None = None):
+    token_rules = token_rules if token_rules is not None else OLD_RUSSIAN_TOKEN_RULES
     if rule_wrapper.rules_to_tokenize is not None:
-        ID_TOKENIZER = IdTokenizer.default()
+        ID_TOKENIZER = IdTokenizer.default(token_rules)
         needed_tokens = _get_needed_tokens(text, ID_TOKENIZER, rule_wrapper.rules_to_tokenize)
         print([t.value for t in needed_tokens])
         return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).findall(needed_tokens)
 
     return Parser(rule_wrapper.root).findall(text)
+
