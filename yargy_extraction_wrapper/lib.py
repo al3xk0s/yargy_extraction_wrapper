@@ -60,8 +60,8 @@ def _get_needed_tokens(text: str, t: IdTokenizer, rules: Sequence[Rule]):
     return list(_select_span_tokens(tokens, spans))
 
 
-OLD_RUSSIAN_TOKEN_RULE = TokenRule(RUSSIAN, r'[а-яёiѣѳv]+')
-OLD_RUSSIAN_TOKEN_RULES = [TokenRule(RUSSIAN, r'[а-яёiѣѳv]+'), *RULES[1:]]
+OLD_RUSSIAN_TOKEN_RULE = TokenRule(RUSSIAN, r'[а-яёіѣѳv]+')
+OLD_RUSSIAN_TOKEN_RULES = [OLD_RUSSIAN_TOKEN_RULE, *RULES[1:]]
 
 
 def parse(text: str, rule_wrapper: RuleWrapper, token_rules: Sequence[TokenRule] | None = None):
