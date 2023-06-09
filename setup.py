@@ -3,6 +3,9 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open('requirements.txt') as f:
+    reqs = [line.strip() for line in f.readlines()]
+
 setuptools.setup(
     name='yargy_extraction_wrapper',
     version='0.0.1',
@@ -16,6 +19,6 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/al3xk0s/yargy_extraction_wrapper/issues"
     },
     license='MIT',
-    packages=['toolbox'],
-    install_requires=['requests'],
+    packages=['yargy_extraction_wrapper'],
+    install_requires=reqs,
 )
