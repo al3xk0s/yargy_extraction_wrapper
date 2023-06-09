@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name='yargy_extraction_wrapper',
-    version='0.0.5',
+    version='0.0.6',
     author='al3xk0s',
     author_email='bebe558812@gmail.com',
     description='Colab wrapper for yargy',

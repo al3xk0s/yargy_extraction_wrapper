@@ -65,11 +65,11 @@ OLD_RUSSIAN_TOKEN_RULES = [TokenRule(RUSSIAN, r'[а-яёiѣѳv]+'), *RULES[1:]]
 
 def parse(text: str, rule_wrapper: RuleWrapper, token_rules: Sequence[TokenRule] | None = None):
     token_rules = token_rules if token_rules is not None else OLD_RUSSIAN_TOKEN_RULES
+    ID_TOKENIZER = IdTokenizer.default(token_rules)
     if rule_wrapper.rules_to_tokenize is not None:
-        ID_TOKENIZER = IdTokenizer.default(token_rules)
         needed_tokens = _get_needed_tokens(text, ID_TOKENIZER, rule_wrapper.rules_to_tokenize)
         print([t.value for t in needed_tokens])
         return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).findall(needed_tokens)
 
-    return Parser(rule_wrapper.root).findall(text)
+    return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER.tokenizer).findall(text)
 
