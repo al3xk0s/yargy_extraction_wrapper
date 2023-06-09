@@ -62,6 +62,6 @@ def parse(text: str, rule_wrapper: RuleWrapper):
     if rule_wrapper.rules_to_tokenize is not None:
         ID_TOKENIZER = IdTokenizer.default()
         needed_tokens = _get_needed_tokens(text, ID_TOKENIZER, rule_wrapper.rules_to_tokenize)
-        return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).matches(needed_tokens)
+        return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).findall(needed_tokens)
 
     return Parser(rule_wrapper.root).findall(text)
