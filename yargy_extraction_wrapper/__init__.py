@@ -1,5 +1,5 @@
-from lib import IdTokenizer, parse
-from rule_wrapper import RuleWrapper
+from yargy_extraction_wrapper.lib import IdTokenizer, parse
+from yargy_extraction_wrapper.rule_wrapper import RuleWrapper
 
 from yargy import *
 from yargy.interpretation import *
