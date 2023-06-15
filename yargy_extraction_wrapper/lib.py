@@ -1,35 +1,11 @@
 from typing import Sequence
 
 from yargy import *
-from yargy.predicates import is_title
-from yargy.tokenizer import *
 from yargy.interpretation import *
 from yargy.rule import *
 
+from yargy_extraction_wrapper.id_tokenizer import IdTokenizer
 from yargy_extraction_wrapper.rule_wrapper import RuleWrapper
-
-
-class IdTokenizer(Tokenizer):
-    def __init__(self, tokenizer):
-        self.tokenizer = tokenizer
-
-    def split(self, text):
-        return self.tokenizer.split(text)
-
-    def check_type(self, t):
-        return self.tokenizer.check_type(t)
-
-    @property
-    def morph(self):
-        return self.tokenizer.morph
-
-    def __call__(self, tokens):
-        return tokens
-
-    @staticmethod
-    def default(rules=RULES):
-        TOKENIZER = MorphTokenizer(rules=rules).remove_types(EOL)
-        return IdTokenizer(TOKENIZER)
 
 
 def _is_inside_span(token, span):
@@ -47,29 +23,29 @@ def _get_needed_tokens(text: str, t: IdTokenizer, rules: Sequence[Rule]):
     ID_TOKENIZER = t
     TOKENIZER = t.tokenizer
 
-    Proxy = fact(
-        'Proxy',
-        ['value'],
-    )
+    Proxy = fact('Proxy', ['value'])
 
     r = or_(*rules).interpretation(Proxy.value).interpretation(Proxy)
     tokens = list(TOKENIZER(text))
     matches = Parser(r, tokenizer=ID_TOKENIZER).findall(tokens)
     spans = [m.span for m in matches]
 
-    return list(_select_span_tokens(tokens, spans))
+    return spans, list(_select_span_tokens(tokens, spans))
 
 
-OLD_RUSSIAN_TOKEN_RULE = TokenRule(RUSSIAN, r'[а-яёіѣѳv]+')
-OLD_RUSSIAN_TOKEN_RULES = [OLD_RUSSIAN_TOKEN_RULE, *RULES[1:]]
+def _parse_rules_to_tokenize(text: str, rule_wrapper: RuleWrapper, t: IdTokenizer):
+    spans, needed_tokens = _get_needed_tokens(text, t, rule_wrapper.rules_to_tokenize)
+    return spans, Parser(rule_wrapper.root, tokenizer=t).findall(needed_tokens)
 
 
-def parse(text: str, rule_wrapper: RuleWrapper, token_rules: Sequence[TokenRule] | None = None):
-    token_rules = token_rules if token_rules is not None else OLD_RUSSIAN_TOKEN_RULES
-    ID_TOKENIZER = IdTokenizer.default(token_rules)
+def _get_tokenizer(rule_wrapper: RuleWrapper):
+    return IdTokenizer(rule_wrapper.tokenizer_factory(rules=rule_wrapper.tokenizer_rules))
+
+
+def parse(text: str, rule_wrapper: RuleWrapper) -> tuple[Sequence, Sequence]:
+    ID_TOKENIZER = _get_tokenizer(rule_wrapper)
     if rule_wrapper.rules_to_tokenize is not None:
-        needed_tokens = _get_needed_tokens(text, ID_TOKENIZER, rule_wrapper.rules_to_tokenize)
-        print([t.value for t in needed_tokens])
-        return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER).findall(needed_tokens)
+        return _parse_rules_to_tokenize(text, rule_wrapper, t=ID_TOKENIZER)
+    ms = list(Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER.tokenizer).findall(text))
+    return [_.span for _ in ms], ms
 
-    return Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER.tokenizer).findall(text)

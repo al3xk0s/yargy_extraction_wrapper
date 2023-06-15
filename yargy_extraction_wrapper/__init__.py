@@ -1,5 +1,5 @@
-from yargy_extraction_wrapper.lib import IdTokenizer, parse, OLD_RUSSIAN_TOKEN_RULES, OLD_RUSSIAN_TOKEN_RULE
-from yargy_extraction_wrapper.rule_wrapper import RuleWrapper
+from yargy_extraction_wrapper.lib import IdTokenizer, parse
+from yargy_extraction_wrapper.rule_wrapper import RuleWrapper, OLD_RUSSIAN_TOKEN_RULES, OLD_RUSSIAN_TOKEN_RULE
 
 from yargy import *
 from yargy.interpretation import *
