@@ -1,5 +1,6 @@
 from typing import Sequence
 
+import dill
 from yargy import *
 from yargy.interpretation import *
 from yargy.rule import *
@@ -49,3 +50,8 @@ def parse(text: str, rule_wrapper: RuleWrapper) -> tuple[Sequence, Sequence]:
     ms = list(Parser(rule_wrapper.root, tokenizer=ID_TOKENIZER.tokenizer).findall(text))
     return [_.span for _ in ms], ms
 
+
+def serialize(rule_wrapper: RuleWrapper):
+    if not isinstance(rule_wrapper, RuleWrapper):
+        raise ValueError('value is not RuleWrapper')
+    return dill.dumps(rule_wrapper, protocol=dill.HIGHEST_PROTOCOL)
