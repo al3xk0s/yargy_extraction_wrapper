@@ -40,7 +40,7 @@ def _parse_rules_to_tokenize(text: str, rule_wrapper: RuleWrapper, t: IdTokenize
 
 
 def _get_tokenizer(rule_wrapper: RuleWrapper):
-    return IdTokenizer(rule_wrapper.tokenizer_factory(rules=rule_wrapper.tokenizer_rules))
+    return IdTokenizer(rule_wrapper.tokenizer)
 
 
 def parse(text: str, rule_wrapper: RuleWrapper) -> tuple[Sequence, Sequence]:
