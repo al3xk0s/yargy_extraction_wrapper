@@ -1,6 +1,7 @@
+import gzip
 from typing import Sequence
 
-import dill
+import cloudpickle
 from yargy import *
 from yargy.interpretation import *
 from yargy.rule import *
@@ -54,4 +55,4 @@ def parse(text: str, rule_wrapper: RuleWrapper) -> tuple[Sequence, Sequence]:
 def serialize(rule_wrapper: RuleWrapper):
     if not isinstance(rule_wrapper, RuleWrapper):
         raise ValueError('value is not RuleWrapper')
-    return dill.dumps(rule_wrapper, protocol=dill.HIGHEST_PROTOCOL)
+    return gzip.compress(cloudpickle.dumps(rule_wrapper))
